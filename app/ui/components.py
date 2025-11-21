@@ -21,6 +21,8 @@ from core.auth import require_admin_login
 def render_view_mode() -> None:
     st.subheader("🔍 View mode")
 
+    col_ratio = [3, 4, 3]
+
     try:
         df = load_corpus_metadata()
     except Exception as e:
@@ -63,13 +65,9 @@ def render_view_mode() -> None:
         with col3:
             c_prev, c_next = st.columns(2)
             with c_prev:
-                top_prev = st.button(
-                    "◀ Previous", disabled=page <= 1, key="top_prev"
-                )
+                top_prev = st.button("◀ Previous", disabled=page <= 1, key="top_prev")
             with c_next:
-                top_next = st.button(
-                    "Next ▶", disabled=page >= total_pages, key="top_next"
-                )
+                top_next = st.button("Next ▶", disabled=page >= total_pages, key="top_next")
 
     if top_prev:
         st.session_state["page"] = max(1, page - 1)
@@ -84,13 +82,10 @@ def render_view_mode() -> None:
     end_idx = min(start_idx + page_size, total_items)
     df_page = df.iloc[start_idx:end_idx].copy()
 
-    st.markdown(
-        f"Showing items **{start_idx + 1}–{end_idx}** "
-        f"(page {page}/{total_pages})"
-    )
+    st.markdown(f"Showing items **{start_idx + 1}–{end_idx}** (page {page}/{total_pages})")
     st.markdown("---")
 
-    header_cols = st.columns([3, 4, 2])
+    header_cols = st.columns(col_ratio)
     with header_cols[0]:
         st.markdown("**File**")
     with header_cols[1]:
@@ -105,18 +100,13 @@ def render_view_mode() -> None:
         text = row["text"]
         filename = str(row["file"]).strip()
 
-        row_cols = st.columns([3, 4, 2])
+        row_cols = st.columns(col_ratio)
 
         with row_cols[0]:
-            file_label = filename
-            if item_id != "":
-                file_label = f"#{item_id} — {filename}"
+            file_label = f"#{item_id} — {filename}" if item_id else filename
             st.markdown(
                 f"""
-                <div style="
-                    white-space: pre-wrap;
-                    word-break: break-all;
-                ">
+                <div style="white-space: pre-wrap; word-break: break-all;">
                     {file_label}
                 </div>
                 """,
@@ -126,10 +116,7 @@ def render_view_mode() -> None:
         with row_cols[1]:
             st.markdown(
                 f"""
-                <div style="
-                    white-space: pre-wrap;
-                    line-height: 1.4em;
-                ">
+                <div style="white-space: pre-wrap; line-height: 1.4em;">
                     {text}
                 </div>
                 """,
@@ -137,12 +124,10 @@ def render_view_mode() -> None:
             )
 
         with row_cols[2]:
+            st.markdown('<div style="height:0.6rem"></div>', unsafe_allow_html=True)
             if settings.AUDIO_MODE.lower() == "local":
                 audio_bytes = get_audio_bytes_local(filename)
-                if audio_bytes is None:
-                    st.error("Not found")
-                else:
-                    st.audio(audio_bytes, format="audio/mp3")
+                st.audio(audio_bytes, format="audio/mp3") if audio_bytes else st.error("Not found")
             else:
                 if not settings.AUDIO_BASE_URL:
                     st.error("No AUDIO_BASE_URL")
@@ -158,20 +143,14 @@ def render_view_mode() -> None:
             st.markdown(f"**Page:** {page} / {total_pages}")
 
         with col2:
-            st.markdown(
-                f"Items **{start_idx + 1}–{end_idx}** / {total_items}"
-            )
+            st.markdown(f"Items **{start_idx + 1}–{end_idx}** / {total_items}")
 
         with col3:
             c_prev, c_next = st.columns(2)
             with c_prev:
-                bottom_prev = st.button(
-                    "◀ Previous", disabled=page <= 1, key="bottom_prev"
-                )
+                bottom_prev = st.button("◀ Previous", disabled=page <= 1, key="bottom_prev")
             with c_next:
-                bottom_next = st.button(
-                    "Next ▶", disabled=page >= total_pages, key="bottom_next"
-                )
+                bottom_next = st.button("Next ▶", disabled=page >= total_pages, key="bottom_next")
 
     if bottom_prev:
         st.session_state["page"] = max(1, page - 1)
