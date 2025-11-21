@@ -36,6 +36,8 @@ def render_view_mode() -> None:
     if "page" not in st.session_state:
         st.session_state["page"] = 1
 
+    top_prev = top_next = bottom_prev = bottom_next = False
+
     with st.container():
         col1, col2, col3 = st.columns([1, 1, 2])
 
@@ -70,11 +72,11 @@ def render_view_mode() -> None:
                 )
 
     if top_prev:
-        page = max(1, page - 1)
-        st.session_state["page"] = page
+        st.session_state["page"] = max(1, page - 1)
+        st.rerun()
     if top_next:
-        page = min(total_pages, page + 1)
-        st.session_state["page"] = page
+        st.session_state["page"] = min(total_pages, page + 1)
+        st.rerun()
 
     page = st.session_state["page"]
 
@@ -172,11 +174,11 @@ def render_view_mode() -> None:
                 )
 
     if bottom_prev:
-        page = max(1, page - 1)
-        st.session_state["page"] = page
+        st.session_state["page"] = max(1, page - 1)
+        st.rerun()
     if bottom_next:
-        page = min(total_pages, page + 1)
-        st.session_state["page"] = page
+        st.session_state["page"] = min(total_pages, page + 1)
+        st.rerun()
 
 
 # ================== EDIT / ADMIN MODE ==================
@@ -201,7 +203,7 @@ def render_edit_mode() -> None:
     with col_logout:
         if st.button("Logout"):
             st.session_state["is_admin"] = False
-            st.experimental_rerun()
+            st.rerun()
 
     st.markdown("---")
 
